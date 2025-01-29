@@ -15,7 +15,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
-import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.SwerveConstants;
 
 public class MAXSwerveModule {
     private final SparkMax driving_spark_max;
@@ -46,36 +46,38 @@ public class MAXSwerveModule {
         turning_pid_controller = turning_spark_max.getClosedLoopController();
 
         // driving motor configuration
-        driving_spark_max_config.idleMode(ModuleConstants.kDrivingMotorIdleMode).smartCurrentLimit(
-                ModuleConstants.kDrivingMotorCurrentLimit);
+        driving_spark_max_config.idleMode(SwerveConstants.DRIVING_MOTOR_IDLE_MODE).smartCurrentLimit(
+                SwerveConstants.DRIVING_MOTOR_CURRENT_LIMIT);
 
         // driving motor encoder configuration
-        driving_spark_max_config.encoder.positionConversionFactor(ModuleConstants.kDrivingEncoderPositionFactor)
-                .velocityConversionFactor(ModuleConstants.kDrivingEncoderVelocityFactor);
+        driving_spark_max_config.encoder
+                .positionConversionFactor(SwerveConstants.DRIVING_ENCODER_POSITION_FACTOR)
+                .velocityConversionFactor(SwerveConstants.DRIVING_ENCODER_VELOCITY_FACTOR);
 
         // driving motor PID controller configuration
         driving_spark_max_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pidf(
-                ModuleConstants.kDrivingP, ModuleConstants.kDrivingI, ModuleConstants.kDrivingD,
-                ModuleConstants.kDrivingFF)
-                .outputRange(ModuleConstants.kDrivingMinOutput, ModuleConstants.kDrivingMaxOutput);
+                SwerveConstants.DRIVING_P, SwerveConstants.DRIVING_I, SwerveConstants.DRIVING_D,
+                SwerveConstants.DRIVING_FF)
+                .outputRange(SwerveConstants.DRIVING_MIN_OUTPUT, SwerveConstants.DRIVING_MAX_OUTPUT);
 
         // turning motor configuration
-        turning_spark_max_config.idleMode(ModuleConstants.kTurningMotorIdleMode).smartCurrentLimit(
-                ModuleConstants.kTurningMotorCurrentLimit);
+        turning_spark_max_config.idleMode(SwerveConstants.TURNING_MOTOR_IDLE_MODE).smartCurrentLimit(
+                SwerveConstants.TURNING_MOTOR_CURRENT_LIMIT);
 
         // turning motor encoder configuration
-        turning_spark_max_config.encoder.positionConversionFactor(ModuleConstants.kTurningEncoderPositionFactor)
-                .velocityConversionFactor(ModuleConstants.kTurningEncoderVelocityFactor).inverted(
-                        ModuleConstants.kTurningEncoderInverted);
+        turning_spark_max_config.encoder
+                .positionConversionFactor(SwerveConstants.TURNING_ENCODER_POSITION_FACTOR)
+                .velocityConversionFactor(SwerveConstants.TURNING_ENCODER_VELOCITY_FACTOR).inverted(
+                        SwerveConstants.TURNING_ENCODER_INVERTED);
 
         // turning motor PID controller configuration
         turning_spark_max_config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder).pidf(
-                ModuleConstants.kTurningP, ModuleConstants.kTurningI, ModuleConstants.kTurningD,
-                ModuleConstants.kTurningFF)
-                .outputRange(ModuleConstants.kTurningMinOutput, ModuleConstants.kTurningMaxOutput)
+                SwerveConstants.TURNING_P, SwerveConstants.TURNING_I, SwerveConstants.TURNING_D,
+                SwerveConstants.TURNING_FF)
+                .outputRange(SwerveConstants.TURNING_MIN_OUTPUT, SwerveConstants.TURNING_MAX_OUTPUT)
                 .positionWrappingEnabled(true)
-                .positionWrappingInputRange(ModuleConstants.kTurningEncoderPositionPIDMinInput,
-                        ModuleConstants.kTurningEncoderPositionPIDMaxInput);
+                .positionWrappingInputRange(SwerveConstants.TURNING_ENCODER_POSITION_PID_MIN_INPUT,
+                        SwerveConstants.TURNING_ENCODER_POSITION_PID_MAX_INPUT);
 
         driving_spark_max.configure(driving_spark_max_config, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
@@ -101,14 +103,14 @@ public class MAXSwerveModule {
     public void setDesiredState(SwerveModuleState desired_state) {
         SwerveModuleState corrected_desired_state = new SwerveModuleState();
         corrected_desired_state.speedMetersPerSecond = desired_state.speedMetersPerSecond;
-        corrected_desired_state.angle = desired_state.angle.plus(Rotation2d.fromRadians(chassis_angular_offset));
+        corrected_desired_state.angle = desired_state.angle
+                .plus(Rotation2d.fromRadians(chassis_angular_offset));
 
-        SwerveModuleState optimized_desired_state = SwerveModuleState.optimize(corrected_desired_state,
-                new Rotation2d(turning_encoder.getPosition()));
+        corrected_desired_state.optimize(new Rotation2d(turning_encoder.getPosition()));
 
-        driving_pid_controller.setReference(optimized_desired_state.speedMetersPerSecond,
+        driving_pid_controller.setReference(corrected_desired_state.speedMetersPerSecond,
                 ControlType.kVelocity);
-        turning_pid_controller.setReference(optimized_desired_state.angle.getRadians(),
+        turning_pid_controller.setReference(corrected_desired_state.angle.getRadians(),
                 ControlType.kPosition);
 
         this.desired_state = desired_state;

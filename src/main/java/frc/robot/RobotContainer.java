@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.JoystickConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -27,10 +27,10 @@ public class RobotContainer {
     private final DriveSubsystem robot_drive = new DriveSubsystem();
 
     // The driver's controller
-    XboxController driver_controller = new XboxController(OIConstants.kDriverControllerPort);
+    XboxController driver_controller = new XboxController(JoystickConstants.DRIVER_CONTROLLER_PORT);
 
     // 2nd Drivers's Controller
-    XboxController mani_controller = new XboxController(OIConstants.kDriverControllerPort1); // Check ports
+    XboxController mani_controller = new XboxController(JoystickConstants.DRIVER_CONTROLLER_PORT1); // Check ports
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -50,9 +50,9 @@ public class RobotContainer {
                 new RunCommand(
 
                         () -> robot_drive.drive(
-                                -MathUtil.applyDeadband(driver_controller.getLeftY(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(driver_controller.getLeftX(), OIConstants.kDriveDeadband),
-                                -MathUtil.applyDeadband(driver_controller.getRightX(), OIConstants.kDriveDeadband),
+                                -MathUtil.applyDeadband(driver_controller.getLeftY(), JoystickConstants.DRIVE_DEADBAND),
+                                -MathUtil.applyDeadband(driver_controller.getLeftX(), JoystickConstants.DRIVE_DEADBAND),
+                                -MathUtil.applyDeadband(driver_controller.getRightX(), JoystickConstants.DRIVE_DEADBAND),
                                 field_centric, true),
 
                         robot_drive));
