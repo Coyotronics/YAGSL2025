@@ -49,18 +49,18 @@ public class MAXSwerveModule {
         driving_encoder.setPosition(0);
     }
 
-    public SwerveModuleState getState() {
+    public SwerveModuleState get_state() {
         return new SwerveModuleState(driving_encoder.getVelocity(),
                 new Rotation2d(turning_encoder.getPosition() - chassis_angular_offset));
     }
 
-    public SwerveModulePosition getPosition() {
+    public SwerveModulePosition get_position() {
         return new SwerveModulePosition(
                 driving_encoder.getPosition(),
                 new Rotation2d(turning_encoder.getPosition() - chassis_angular_offset));
     }
 
-    public void setDesiredState(SwerveModuleState desired_state) {
+    public void set_desired_state(SwerveModuleState desired_state) {
         SwerveModuleState corrected_desired_state = new SwerveModuleState();
         corrected_desired_state.speedMetersPerSecond = desired_state.speedMetersPerSecond;
         corrected_desired_state.angle = desired_state.angle
@@ -76,7 +76,7 @@ public class MAXSwerveModule {
         this.desired_state = desired_state;
     }
 
-    public void resetEncoders() {
+    public void reset_encoders() {
         driving_encoder.setPosition(0);
     }
 }
