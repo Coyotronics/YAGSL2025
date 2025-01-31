@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
-public class Measurements {
+public class RobotMeasurements {
     // Driving Parameters - Note that these are not the maximum capable speeds of the robot, rather the allowed maximum speeds
     public static final double MAX_SPEED_METERS_PER_SECOND = 4.8; // 4.8 is 80% of allowed speed
     public static final double MAX_ANGULAR_SPEED = 2 * Math.PI; // Maximum angular speed in radians per second
