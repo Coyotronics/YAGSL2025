@@ -35,7 +35,7 @@ public class SparkMaxConfigs {
                 .smartCurrentLimit(SwerveConstants.TURNING_MOTOR_CURRENT_LIMIT);
 
         // turning motor encoder configuration
-        config.encoder
+        config.absoluteEncoder
                 .positionConversionFactor(SwerveConstants.TURNING_ENCODER_POSITION_FACTOR)
                 .velocityConversionFactor(SwerveConstants.TURNING_ENCODER_VELOCITY_FACTOR)
                 .inverted(SwerveConstants.TURNING_ENCODER_INVERTED);
