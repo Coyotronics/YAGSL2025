@@ -22,30 +22,30 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.Constants.Measurements;
+import frc.robot.Constants.RobotMeasurements;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.SwerveUtils;
 
 public class DriveSubsystem extends SubsystemBase {
     private final MAXSwerveModule front_left = new MAXSwerveModule(
-            Measurements.FRONT_LEFT_DRIVING_CAN_ID,
-            Measurements.FRONT_LEFT_TURNING_CAN_ID,
-            Measurements.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
+            RobotMeasurements.FRONT_LEFT_DRIVING_CAN_ID,
+            RobotMeasurements.FRONT_LEFT_TURNING_CAN_ID,
+            RobotMeasurements.FRONT_LEFT_CHASSIS_ANGULAR_OFFSET);
 
     private final MAXSwerveModule front_right = new MAXSwerveModule(
-            Measurements.FRONT_RIGHT_DRIVING_CAN_ID,
-            Measurements.FRONT_RIGHT_TURNING_CAN_ID,
-            Measurements.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
+            RobotMeasurements.FRONT_RIGHT_DRIVING_CAN_ID,
+            RobotMeasurements.FRONT_RIGHT_TURNING_CAN_ID,
+            RobotMeasurements.FRONT_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     private final MAXSwerveModule back_left = new MAXSwerveModule(
-            Measurements.BACK_LEFT_DRIVING_CAN_ID,
-            Measurements.BACK_LEFT_TURNING_CAN_ID,
-            Measurements.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
+            RobotMeasurements.BACK_LEFT_DRIVING_CAN_ID,
+            RobotMeasurements.BACK_LEFT_TURNING_CAN_ID,
+            RobotMeasurements.BACK_LEFT_CHASSIS_ANGULAR_OFFSET);
 
     private final MAXSwerveModule back_right = new MAXSwerveModule(
-            Measurements.BACK_RIGHT_DRIVING_CAN_ID,
-            Measurements.BACK_RIGHT_TURNING_CAN_ID,
-            Measurements.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
+            RobotMeasurements.BACK_RIGHT_DRIVING_CAN_ID,
+            RobotMeasurements.BACK_RIGHT_TURNING_CAN_ID,
+            RobotMeasurements.BACK_RIGHT_CHASSIS_ANGULAR_OFFSET);
 
     private final ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 
@@ -53,12 +53,12 @@ public class DriveSubsystem extends SubsystemBase {
     private double current_translation_dir = 0.0;
     private double current_translation_mag = 0.0;
 
-    private SlewRateLimiter mag_limiter = new SlewRateLimiter(Measurements.MAGNITUDE_SLEW_RATE);
-    private SlewRateLimiter rot_limiter = new SlewRateLimiter(Measurements.ROTATIONAL_SLEW_RATE);
+    private SlewRateLimiter mag_limiter = new SlewRateLimiter(RobotMeasurements.MAGNITUDE_SLEW_RATE);
+    private SlewRateLimiter rot_limiter = new SlewRateLimiter(RobotMeasurements.ROTATIONAL_SLEW_RATE);
     private double prev_time = WPIUtilJNI.now() * 1e-6;
 
     SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-            Measurements.DRIVE_KINEMATICS,
+            RobotMeasurements.DRIVE_KINEMATICS,
             Rotation2d.fromDegrees(get_angle()),
             new SwerveModulePosition[] {
                     front_left.get_position(),
@@ -134,7 +134,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public ChassisSpeeds get_robot_relative_speeds() {
-        return Measurements.DRIVE_KINEMATICS.toChassisSpeeds(get_module_states());
+        return RobotMeasurements.DRIVE_KINEMATICS.toChassisSpeeds(get_module_states());
     }
 
     public void drive_robot_relative(ChassisSpeeds speeds) {
@@ -154,7 +154,7 @@ public class DriveSubsystem extends SubsystemBase {
 
             double direction_slew_rate;
             if (current_translation_mag != 0.0) {
-                direction_slew_rate = Math.abs(Measurements.DIRECTION_SLEW_RATE / current_translation_mag);
+                direction_slew_rate = Math.abs(RobotMeasurements.DIRECTION_SLEW_RATE / current_translation_mag);
             } else {
                 direction_slew_rate = 500.0;
             }
@@ -192,17 +192,17 @@ public class DriveSubsystem extends SubsystemBase {
             current_rotation = rotation;
         }
 
-        double x_speed_delivered = x_speed_commanded * Measurements.MAX_SPEED_METERS_PER_SECOND;
-        double y_speed_delivered = y_speed_commanded * Measurements.MAX_SPEED_METERS_PER_SECOND;
-        double rot_delivered = current_rotation * Measurements.MAX_ANGULAR_SPEED;
+        double x_speed_delivered = x_speed_commanded * RobotMeasurements.MAX_SPEED_METERS_PER_SECOND;
+        double y_speed_delivered = y_speed_commanded * RobotMeasurements.MAX_SPEED_METERS_PER_SECOND;
+        double rot_delivered = current_rotation * RobotMeasurements.MAX_ANGULAR_SPEED;
 
-        var swerve_module_states = Measurements.DRIVE_KINEMATICS.toSwerveModuleStates(
+        var swerve_module_states = RobotMeasurements.DRIVE_KINEMATICS.toSwerveModuleStates(
                 field_relative
                         ? ChassisSpeeds.fromFieldRelativeSpeeds(x_speed_delivered, y_speed_delivered, rot_delivered,
                                 Rotation2d.fromDegrees(get_angle()))
                         : new ChassisSpeeds(x_speed_delivered, y_speed_delivered, rot_delivered));
         SwerveDriveKinematics.desaturateWheelSpeeds(
-                swerve_module_states, Measurements.MAX_SPEED_METERS_PER_SECOND);
+                swerve_module_states, RobotMeasurements.MAX_SPEED_METERS_PER_SECOND);
         front_left.set_desired_state(swerve_module_states[0]);
         front_right.set_desired_state(swerve_module_states[1]);
         back_left.set_desired_state(swerve_module_states[2]);
@@ -218,7 +218,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void set_module_states(SwerveModuleState[] desired_states) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
-                desired_states, Measurements.MAX_SPEED_METERS_PER_SECOND);
+                desired_states, RobotMeasurements.MAX_SPEED_METERS_PER_SECOND);
         front_left.set_desired_state(desired_states[0]);
         front_right.set_desired_state(desired_states[1]);
         back_left.set_desired_state(desired_states[2]);
@@ -241,7 +241,7 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     public double get_turn_rate() {
-        return gyro.getRate() * (Measurements.GYRO_REVERSED ? -1.0 : 1.0);
+        return gyro.getRate() * (RobotMeasurements.GYRO_REVERSED ? -1.0 : 1.0);
     }
 
     public double get_angle() {
