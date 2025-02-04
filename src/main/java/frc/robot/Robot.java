@@ -113,7 +113,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         // Periodic Methods (Not recommended for regular use)
-
+        Telemetery.update();
     }
 
     @Override

@@ -26,6 +26,8 @@ import frc.robot.Constants.RobotMeasurements;
 import frc.robot.Constants.SwerveConstants;
 import frc.utils.SwerveUtils;
 
+import frc.robot.Telemetery;
+
 public class DriveSubsystem extends SubsystemBase {
     private final MAXSwerveModule front_left = new MAXSwerveModule(
             RobotMeasurements.FRONT_LEFT_DRIVING_CAN_ID,
@@ -148,6 +150,19 @@ public class DriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("YSpeed", y_speed);
         SmartDashboard.putNumber("Rotation", rotation);
 
+        Telemetery.measured_states_obj[0] = front_left.get_state();
+        Telemetery.measured_states_obj[1] = front_right.get_state();
+        Telemetery.measured_states_obj[2] = back_left.get_state();
+        Telemetery.measured_states_obj[3] = back_right.get_state();
+
+        Telemetery.measured_chassis_speeds_obj = RobotMeasurements.DRIVE_KINEMATICS.toChassisSpeeds(
+                new SwerveModuleState[] {
+                        front_left.get_state(),
+                        front_right.get_state(),
+                        back_left.get_state(),
+                        back_right.get_state()
+                });
+
         if (rate_limit) {
             double input_translation_dir = Math.atan2(y_speed, x_speed);
             double input_translation_mag = Math.sqrt(Math.pow(x_speed, 2) + Math.pow(y_speed, 2));
@@ -207,6 +222,10 @@ public class DriveSubsystem extends SubsystemBase {
         front_right.set_desired_state(swerve_module_states[1]);
         back_left.set_desired_state(swerve_module_states[2]);
         back_right.set_desired_state(swerve_module_states[3]);
+
+        Telemetery.desired_states_obj = swerve_module_states.clone();
+        Telemetery.desired_chassis_speeds_obj = RobotMeasurements.DRIVE_KINEMATICS.toChassisSpeeds(swerve_module_states);
+        Telemetery.robot_rotation_obj = Rotation2d.fromDegrees(get_angle());
     }
 
     public void set_x() {
